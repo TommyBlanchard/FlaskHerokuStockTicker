@@ -6,25 +6,25 @@ from bokeh.palettes import Spectral11
 from bokeh.embed import components 
 from flask import Flask,render_template,request,redirect,session
 
-app_ticker = Flask(__name__)
+app = Flask(__name__)
 
-app_ticker.vars={}
+app.vars={}
 
 
-@app_ticker.route('/')
+@app.route('/')
 def main():
   return redirect('/index')
 
-@app_ticker.route('/index', methods=['GET'])
+@app.route('/index', methods=['GET'])
 def index():
     return render_template('index.html')
     
-@app_ticker.route('/graph', methods=['POST'])
+@app.route('/graph', methods=['POST'])
 def graph():
 #    if request.method == 'POST':
-        app_ticker.vars['ticker'] = request.form['ticker']
+        app.vars['ticker'] = request.form['ticker']
 
-        api_url = 'https://www.quandl.com/api/v1/datasets/WIKI/%s.json?api_key=gVz7XbzeecyxHdkCn8yB' % app_ticker.vars['ticker']
+        api_url = 'https://www.quandl.com/api/v1/datasets/WIKI/%s.json?api_key=gVz7XbzeecyxHdkCn8yB' % app.vars['ticker']
         session = requests.Session()
         session.mount('http://', requests.adapters.HTTPAdapter(max_retries=3))
         raw_data = session.get(api_url)
@@ -46,4 +46,4 @@ def graph():
         return render_template('graph.html', script=script, div=div)
 
 if __name__ == '__main__':
-    app_ticker.run(port=33507)
+    app.run(port=33507)
