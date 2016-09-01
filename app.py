@@ -23,7 +23,7 @@ def index():
 def graph():
 #    if request.method == 'POST':
         app.vars['ticker'] = request.form['ticker']
-
+        
         api_url = 'https://www.quandl.com/api/v1/datasets/WIKI/%s.json?api_key=gVz7XbzeecyxHdkCn8yB' % app.vars['ticker']
         session = requests.Session()
         session.mount('http://', requests.adapters.HTTPAdapter(max_retries=3))
@@ -34,14 +34,18 @@ def graph():
 
         df['Date'] = pandas.to_datetime(df['Date'])
 
-        p = figure(title='Data from Quandle WIKI set',
+        p = figure(title='Stock prices for ' % app.vars['ticker'],
             x_axis_label='date',
             x_axis_type='datetime')
-
-        p.line(x=df['Date'].values, 
-            y=df['Close'].values,
-            line_width=2)
-      
+        
+        if request.form.get('Close'):
+            p.line(x=df['Date'].values, y=df['Close'].values,line_width=2, legend='Close')
+        if request.form.get('Adj. Close'):
+            p.line(x=df['Date'].values, y=df['Adj. Close'].values,line_width=2, legend='Adj. Close')
+        if request.form.get('Open'):
+            p.line(x=df['Date'].values, y=df['Open'].values,line_width=2, legend='Open')
+        if request.form.get('Adj. Close'):
+            p.line(x=df['Date'].values, y=df['Adj. Open'].values,line_width=2, legend='Adj. Open')
         script, div = components(p)
         return render_template('graph.html', script=script, div=div)
 
